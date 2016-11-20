@@ -5,6 +5,9 @@ import math         # Math operations
 
 # Our Libraries
 import colors_helpers as ch  # Colors helpers
+import Triangle as th
+import FilipsModel as hfm
+import TonyModel as htm
 
 # Calculates the distance between points
 def distance(pointA, pointB):
@@ -89,6 +92,7 @@ def analyze(ip):
     hullWithoutPoints = cv2.convexHull(cnt, returnPoints=False)
     defects = cv2.convexityDefects(cnt, hullWithoutPoints)
     count_defects = 0
+    triangles = []
     for i in range(defects.shape[0]):
         s, e, f, d = defects[i, 0]
         start = tuple(cnt[s][0])
@@ -100,8 +104,18 @@ def analyze(ip):
         angle = math.acos((b ** 2 + c ** 2 - a ** 2) / (2 * b * c)) * 60
         if angle <= 90:
             count_defects += 1
-            cv2.circle(crop_img, far, ip.defectInternRadius, ip.yellow, ip.defectExternRadius)
+            triangle = th.Triangle(start,end,far)
+            triangles.append(triangle)
         cv2.line(crop_img, start, end, ip.red, ip.lineThickness)
+
+    # Calculate center of hand
+    centerOfHand = th.listToTuple(th.obtainCenterOfHand(triangles))
+
+    handModel = hfm.FilipsModel(centerOfHand,triangles)
+    handModel.drawLines(drawing, ip.magenta, ip.lineThickness)
+    handModel.drawDefects(drawing, ip.yellow, ip.defectInternRadius, ip.defectExternRadius)
+    handModel2 = htm.TonyModel(centerOfHand, triangles)
+    handModel2.drawLines(drawing, ip.cyan, ip.lineThickness)
 
     # cv2.imshow('Contours', all_img)
     cv2.imwrite("drawing.png", drawing)
