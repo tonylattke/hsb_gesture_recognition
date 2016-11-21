@@ -14,8 +14,9 @@ def obtainCenterOfHand(triangles):
     for triangle in triangles:
         center[0] += triangle.defect[0]
         center[1] += triangle.defect[1]
-    center[0] /= len(triangles)
-    center[1] /= len(triangles)
+    if len(triangles) > 0:
+        center[0] /= len(triangles)
+        center[1] /= len(triangles)
     return center
 
 class Triangle:
