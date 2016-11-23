@@ -6,6 +6,7 @@ import numpy as np  # Functions for images
 import cv2  # OpenCV
 from matplotlib import pyplot as plt  # Interface
 import math  # Math operations
+import gui
 
 # Our Libraries
 import colors_helpers as ch  # Colors helpers
@@ -121,12 +122,16 @@ def main():
 
     # Render
     all_img = np.hstack((drawing, crop_img))
-    cv2.imshow('Contours', all_img)
+    # cv2.imshow('Contours', all_img)
+    cv2.imwrite("drawing.png", drawing)
+    cv2.imwrite("crop_img.png", crop_img)
 
     # Exit
     cv2.waitKey(0)
     cv2.destroyAllWindows()
 
 
-# Run main program
+# Run main program TODO: Namensgebung verbessern
 main()
+fi = gui.MainApp()
+fi.run()

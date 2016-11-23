@@ -30,22 +30,20 @@ class MainApp(App):
 
     def build(self):
         root = RootWidget()
-        c = CustomLayout()
-        root.add_widget(c)
-        c.add_widget(
-            AsyncImage(
-                source="finger_1.png",
-                size_hint= (1, .5),
-                pos_hint={'center_x':.5, 'center_y':.5}))
-        root.add_widget(AsyncImage(source='finger_1.png'))
-        c = CustomLayout()
-        c.add_widget(
-            AsyncImage(
-                source="finger_almost_closed.png",
-                size_hint= (1, .5),
-                pos_hint={'center_x':.5, 'center_y':.5}))
-        root.add_widget(c)
+        # c = CustomLayout()
+        # root.add_widget(c)
+        # c.add_widget(
+        #     AsyncImage(
+        #         source="finger_1.png",
+        #         size_hint= (1, .5),
+        #         pos_hint={'center_x':.5, 'center_y':.5}))
+        root.add_widget(AsyncImage(source='drawing.png'))
+        root.add_widget(AsyncImage(source='crop_img.png'))
+        # c = CustomLayout()
+        # c.add_widget(
+        #     AsyncImage(
+        #         source="finger_almost_closed.png",
+        #         size_hint= (1, .5),
+        #         pos_hint={'center_x':.5, 'center_y':.5}))
+        # root.add_widget(c)
         return root
-
-if __name__ == '__main__':
-    MainApp().run()
