@@ -21,8 +21,11 @@ import ImageProcessor as ip
 imageProcessor = ip.ImageProcessor()
 chosenImage = Image(source='images/hand.jpg', pos=(500, 200), size=(200, 200))
 drawingImage = Image(source='drawing.png', pos=(500, 200), size=(200, 200))
-widthCropSlider = Slider(min=0, max=chosenImage._coreimage._size[0], value=0, steps=1)
-heightCropSlider = Slider(min=0, max=chosenImage._coreimage._size[0], value=0, steps=1)
+widthCropSlider = Slider(min=10, max=(chosenImage._coreimage._size[0] / 100 * 90), value=(chosenImage._coreimage._size[0] / 100 * 90), steps=1)
+heightCropSlider = Slider(min=10, max=(chosenImage._coreimage._size[1] / 100 * 90), value=(chosenImage._coreimage._size[1] / 100 * 90), steps=1)
+xCropSlider = Slider(min=0, max=(chosenImage._coreimage._size[0] - 100), value=0, steps=1)
+yCropSlider = Slider(min=0, max=(chosenImage._coreimage._size[1] - 100), value=0, steps=1)
+amountOfFingersLabel = Label(text='')
 
 # Create the screen manager
 sm = ScreenManager()
@@ -111,16 +114,17 @@ class MainApp(App):
         changeToMainButton = Button(text="Go back to main",
                                     size_hint=(.2, .1),
                                     pos_hint={'center_x': .5, 'center_y': 0.95})
-        changeToMainButton.bind(on_press=MainApp.changeToMainScreen)
+        changeToMainButton.bind(on_press=MainApp.changeToMainScreenFromFileChooser)
         fileChooserScreenLayout.add_widget(changeToMainButton)
         fileChooserWidget = FileChooserWidget()
         fileChooserScreenLayout.add_widget(fileChooserWidget)
 
     # --- Constructs the file Chooser Screen Layout
     def constructImageScreen(self, imageScreenLayout):
-        buttonLayout = BoxLayout(orientation='vertical', size_hint=(.4, .6), pos_hint={'center_x': 0.1, 'center_y': 0.7})
+        buttonLayout = BoxLayout(orientation='vertical', size_hint=(.4, .6),
+                                 pos_hint={'center_x': 0.1, 'center_y': 0.7})
         changeToMainButton = Button(text="Go back to main")
-        changeToMainButton.bind(on_press=MainApp.changeToMainScreen)
+        changeToMainButton.bind(on_press=MainApp.changeToMainScreenFromImage)
         blurSliderLabel = Label(text='blur slider')
         blurSlider = Slider(min=5,
                             max=155,
@@ -129,17 +133,9 @@ class MainApp(App):
         blurSlider.bind(value=MainApp.onBlurSliderValueChange)
 
         xCropStartPositionLabel = Label(text='X: crop start position')
-        xCropSlider = Slider(min=0,
-                             max=chosenImage._coreimage._size[0],
-                             value=0,
-                             steps=1)
         xCropSlider.bind(value=MainApp.onXCropSliderValueChange)
 
         yCropStartPositionLabel = Label(text='Y: crop start position')
-        yCropSlider = Slider(min=0,
-                             max=chosenImage._coreimage._size[1],
-                             value=0,
-                             steps=1)
         yCropSlider.bind(value=MainApp.onYCropSliderValueChange)
 
         widthCropLabel = Label(text='Width crop length')
@@ -164,6 +160,8 @@ class MainApp(App):
         buttonLayout.add_widget(heightCropLabel)
         buttonLayout.add_widget(heightCropSlider)
 
+        buttonLayout.add_widget(amountOfFingersLabel)
+
         imageScreenLayout.add_widget(buttonLayout)
         ip.analyze(imageProcessor)
         chosenImage.reload()
@@ -181,29 +179,35 @@ class MainApp(App):
         sm.current = IMAGE_SCREEN_ID
         sm.transition.direction = 'up'
 
-    # --- Change to main screen
-    def changeToMainScreen(root):
+    # --- Change to main screen from file chooser
+    def changeToMainScreenFromFileChooser(root):
         sm.current = MAIN_SCREEN_ID
         sm.transition.direction = 'right'
+
+    # --- Change to main screen from file chooser
+    def changeToMainScreenFromImage(root):
+        sm.current = MAIN_SCREEN_ID
+        sm.transition.direction = 'down'
 
     # --- Setting the blur slider value
     def onBlurSliderValueChange(instance, value):
         imageProcessor.blurringLevel = int(value)
+        amountOfFingersLabel.text = str(value)
         renderCallback()
 
     # --- Setting the x crop slider value
     def onXCropSliderValueChange(instance, value):
         imageProcessor._croopingX = int(value)
-        widthCropSlider.max = chosenImage._coreimage._size[0] - int(value)
+        widthCropSlider.max = (chosenImage._coreimage._size[0]) - int(value)
         renderCallback()
 
     # --- Setting the y crop slider value
     def onYCropSliderValueChange(instance, value):
         imageProcessor._croopingY = int(value)
-        heightCropSlider.max = chosenImage._coreimage._size[1] - int(value)
+        heightCropSlider.max = (chosenImage._coreimage._size[1]) - int(value)
         renderCallback()
 
-    # --- Setting the width crop slider value
+    # --- Setting the width crop slider value- int(value)
     def onWidthCropSliderValueChange(instance, value):
         imageProcessor._croopingWidth = int(value)
         renderCallback()
@@ -255,7 +259,6 @@ class FileChooserWidget(FloatLayout):
             if chosenImage is not None:
                 chosenImage.source = chosenFile
                 chosenImage.reload()
-                chosenImageHeigh = chosenImage._coreimage._size[1]
             renderCallback()
             sm.current = MAIN_SCREEN_ID
             sm.transition.direction = 'right'
