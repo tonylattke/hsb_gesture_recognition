@@ -128,6 +128,9 @@ class MainApp(App):
         buttonLayout.add_widget(changeToMainButton)
         buttonLayout.add_widget(blurSlider)
         imageScreenLayout.add_widget(buttonLayout)
+        ip.analyze(imageProcessor)
+        chosenImage.reload()
+        drawingImage.reload()
         imageScreenLayout.add_widget(chosenImage)
         imageScreenLayout.add_widget(drawingImage)
 
