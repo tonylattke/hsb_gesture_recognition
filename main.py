@@ -3,23 +3,22 @@
 # Python Libraries
 import os
 from kivy.app import App
-from kivy.graphics import Color, Rectangle
 from kivy.uix.boxlayout import BoxLayout
-from kivy.uix.filechooser import FileChooserIconView
 from kivy.uix.floatlayout import FloatLayout
-from kivy.uix.gridlayout import GridLayout
 from kivy.uix.image import Image
 from kivy.clock import Clock
 from kivy.uix.button import Button
 from kivy.config import Config
 from kivy.lang import Builder
 from kivy.uix.screenmanager import ScreenManager, Screen
+from kivy.uix.slider import Slider
 
 # Our Libraries
 import ImageProcessor as ip
 
 # Static variables
 imageProcessor = ip.ImageProcessor()
+chosenImage = None
 drawingImage = Image(source='drawing.png', pos=(500, 200), size=(200, 200))
 
 # Create the screen manager
@@ -34,8 +33,8 @@ FILE_CHOOSER_SCREEN_ID = 'filechooser_screen'
 IMAGE_SCREEN_ID = "image_screen"
 
 # Settings
-Config.set('graphics', 'width', '1024')
-Config.set('graphics', 'height', '640')
+Config.set('graphics', 'width', '1360')
+Config.set('graphics', 'height', '1024')
 
 
 # Float Widget
@@ -51,9 +50,9 @@ class BoxWidget(BoxLayout):
 # Main app
 class MainApp(App):
     # --- Define the both Layouts ---
-    mainScreenLayout = BoxWidget(orientation='vertical', size=(1024, 640))
-    fileChooserScreenLayout = FloatWidget(size=(1024, 640))
-    imageScreenLayout = BoxWidget(orientation='horizontal', size=(1024, 640))
+    mainScreenLayout = BoxWidget(orientation='vertical', size=(1360, 640))
+    fileChooserScreenLayout = FloatWidget(size=(1360, 640))
+    imageScreenLayout = BoxWidget(orientation='horizontal', size=(1360, 640))
 
     # ------------
 
@@ -64,8 +63,6 @@ class MainApp(App):
         fileChooserScreen = FileChooserScreen(name=FILE_CHOOSER_SCREEN_ID)
         imageScreen = ImageScreen(name=IMAGE_SCREEN_ID)
         # ------------
-
-        Clock.schedule_interval(renderCallback, 0.1)
 
         # --- Construct main Screen ---
         self.constructMainScreen(self.mainScreenLayout)
@@ -118,11 +115,19 @@ class MainApp(App):
 
     # --- Constructs the file Chooser Screen Layout
     def constructImageScreen(self, imageScreenLayout):
-        changeToMainButton = Button(text="Go back to main",
-                                    size_hint=(.2, .1),
-                                    pos_hint={'center_x': .5, 'center_y': 0.95})
+        buttonLayout = BoxLayout(orientation='vertical', size_hint=(.2, .2), pos_hint={'center_x': 0, 'center_y': 0.9})
+        changeToMainButton = Button(text="Go back to main")
         changeToMainButton.bind(on_press=MainApp.changeToMainScreen)
-        imageScreenLayout.add_widget(changeToMainButton)
+
+        blurSlider = Slider(min=5,
+                            max=155,
+                            value=45,
+                            step=10)
+        blurSlider.bind(value=MainApp.onSliderValueChange)
+
+        buttonLayout.add_widget(changeToMainButton)
+        buttonLayout.add_widget(blurSlider)
+        imageScreenLayout.add_widget(buttonLayout)
         imageScreenLayout.add_widget(drawingImage)
 
     # --- Change to file chooser screen
@@ -133,15 +138,26 @@ class MainApp(App):
     # --- Change to image screen
     def changeToImageScreen(root):
         sm.current = IMAGE_SCREEN_ID
-        MainApp.imageScreenLayout.remove_widget(drawingImage)
-        drawingImage.reload()
-        MainApp.imageScreenLayout.add_widget(drawingImage)
         sm.transition.direction = 'up'
 
     # --- Change to main screen
     def changeToMainScreen(root):
         sm.current = MAIN_SCREEN_ID
         sm.transition.direction = 'right'
+
+    # --- Setting the slider value
+    def onSliderValueChange(instance, value):
+        imageProcessor.blurringLevel = int(value)
+        renderCallback()
+
+
+# --- Render callback
+def renderCallback():
+    ip.analyze(imageProcessor)
+    MainApp.imageScreenLayout.remove_widget(drawingImage)
+    drawingImage.reload()
+    MainApp.imageScreenLayout.add_widget(drawingImage)
+    print 'done'
 
 
 # Declare screens
@@ -169,15 +185,18 @@ Builder.load_string("""
 
 class FileChooserWidget(FloatLayout):
     def selected(self, path, filename):
-        chosenFile = os.path.join(path, filename[0])
-        imageProcessor.fileName = chosenFile
-        sm.current = MAIN_SCREEN_ID
-        sm.transition.direction = 'right'
-
-
-# Render callback
-def renderCallback(dt):
-    ip.analyze(imageProcessor)
+        print filename
+        if len(filename) > 0:
+            chosenFile = os.path.join(path, filename[0])
+            imageProcessor.fileName = chosenFile
+            chosenImage = Image(source=chosenFile, pos=(500, 200), size=(200, 200))
+            if chosenImage is not None:
+                MainApp.imageScreenLayout.remove_widget(chosenImage)
+                drawingImage.reload()
+                MainApp.imageScreenLayout.add_widget(chosenImage)
+            renderCallback()
+            sm.current = MAIN_SCREEN_ID
+            sm.transition.direction = 'right'
 
 
 # Run app
