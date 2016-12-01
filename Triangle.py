@@ -1,13 +1,19 @@
 def tupleToList(point):
     return [point[0], point[1]]
 
-def listToTuple(point):
-    return (point[0], point[1])
 
-def averagePoint(pointA,pointB):
-    x = (pointA[0] + pointB[0]) /2
+def listToTuple(point):
+    if point is not None:
+        return (point[0], point[1])
+    else:
+        return (0, 0)
+
+
+def averagePoint(pointA, pointB):
+    x = (pointA[0] + pointB[0]) / 2
     y = (pointA[1] + pointB[1]) / 2
-    return [x,y]
+    return [x, y]
+
 
 def obtainCenterOfHand(triangles):
     center = [0, 0]
@@ -18,6 +24,7 @@ def obtainCenterOfHand(triangles):
         center[0] /= len(triangles)
         center[1] /= len(triangles)
     return center
+
 
 class Triangle:
     fingerA = []
