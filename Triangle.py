@@ -23,6 +23,8 @@ def obtainCenterOfHand(triangles):
     if len(triangles) > 0:
         center[0] /= len(triangles)
         center[1] /= len(triangles)
+    else:
+        center = [-1,-1]
     return center
 
 

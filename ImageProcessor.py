@@ -13,6 +13,13 @@ import TonyModel as htm
 def distance(pointA, pointB):
     return math.sqrt((pointB[0] - pointA[0]) ** 2 + (pointB[1] - pointA[1]) ** 2)
 
+# Calculates the angle between 3 Points
+def calculateAngle(start, end, far):
+    a = distance(start, end)
+    b = distance(far, start)
+    c = distance(end, far)
+    return math.acos((b ** 2 + c ** 2 - a ** 2) / (2 * b * c)) * 60
+
 # Image Processor
 class ImageProcessor:
     # Define colors
@@ -42,6 +49,8 @@ class ImageProcessor:
 
     crooping = True
     fileName = 'images/hand.jpg'
+
+    numberOfFingers = 0
 
     def __init__(self):
         print "Image processor ready"
@@ -103,10 +112,7 @@ def analyze(ip):
                 start = tuple(cnt[s][0])
                 end = tuple(cnt[e][0])
                 far = tuple(cnt[f][0])
-                a = distance(start, end)
-                b = distance(far, start)
-                c = distance(end, far)
-                angle = math.acos((b ** 2 + c ** 2 - a ** 2) / (2 * b * c)) * 60
+                angle = calculateAngle(start,end,far)
                 if angle <= 90:
                     count_defects += 1
                     triangle = th.Triangle(start,end,far)
@@ -117,6 +123,8 @@ def analyze(ip):
         centerOfHand = th.listToTuple(th.obtainCenterOfHand(triangles))
 
         handModel = hfm.FilipsModel(centerOfHand,triangles)
+        ip.numberOfFingers = handModel.countOfFinger()
+        #handModel.getCenter()
         handModel.drawLines(drawing, ip.magenta, ip.lineThickness)
         handModel.drawDefects(drawing, ip.yellow, ip.defectInternRadius, ip.defectExternRadius)
         handModel2 = htm.TonyModel(centerOfHand, triangles)
