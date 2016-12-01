@@ -23,8 +23,8 @@ chosenImage = Image(source='images/hand.jpg', pos=(500, 200), size=(200, 200))
 drawingImage = Image(source='drawing.png', pos=(500, 200), size=(200, 200))
 widthCropSlider = Slider(min=10, max=(chosenImage._coreimage._size[0] / 100 * 90), value=(chosenImage._coreimage._size[0] / 100 * 90), steps=1)
 heightCropSlider = Slider(min=10, max=(chosenImage._coreimage._size[1] / 100 * 90), value=(chosenImage._coreimage._size[1] / 100 * 90), steps=1)
-xCropSlider = Slider(min=0, max=(chosenImage._coreimage._size[0] - 100), value=0, steps=1)
-yCropSlider = Slider(min=0, max=(chosenImage._coreimage._size[1] - 100), value=0, steps=1)
+xCropSlider = Slider(min=0, max=(chosenImage._coreimage._size[0]), value=0, steps=1)
+yCropSlider = Slider(min=0, max=(chosenImage._coreimage._size[1]), value=0, steps=1)
 amountOfFingersLabel = Label(text='')
 
 # Create the screen manager
@@ -192,7 +192,6 @@ class MainApp(App):
     # --- Setting the blur slider value
     def onBlurSliderValueChange(instance, value):
         imageProcessor.blurringLevel = int(value)
-        amountOfFingersLabel.text = str(value)
         renderCallback()
 
     # --- Setting the x crop slider value
@@ -221,6 +220,7 @@ class MainApp(App):
 # --- Render callback
 def renderCallback():
     ip.analyze(imageProcessor)
+    amountOfFingersLabel.text = str(imageProcessor.numberOfFingers)
     MainApp.imageScreenLayout.remove_widget(drawingImage)
     drawingImage.reload()
     MainApp.imageScreenLayout.add_widget(drawingImage)
