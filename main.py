@@ -18,7 +18,7 @@ import ImageProcessor as ip
 
 # Static variables
 imageProcessor = ip.ImageProcessor()
-chosenImage = None
+chosenImage = Image(source='images/hand.jpg', pos=(500, 200), size=(200, 200))
 drawingImage = Image(source='drawing.png', pos=(500, 200), size=(200, 200))
 
 # Create the screen manager
@@ -128,6 +128,7 @@ class MainApp(App):
         buttonLayout.add_widget(changeToMainButton)
         buttonLayout.add_widget(blurSlider)
         imageScreenLayout.add_widget(buttonLayout)
+        imageScreenLayout.add_widget(chosenImage)
         imageScreenLayout.add_widget(drawingImage)
 
     # --- Change to file chooser screen
@@ -189,11 +190,9 @@ class FileChooserWidget(FloatLayout):
         if len(filename) > 0:
             chosenFile = os.path.join(path, filename[0])
             imageProcessor.fileName = chosenFile
-            chosenImage = Image(source=chosenFile, pos=(500, 200), size=(200, 200))
             if chosenImage is not None:
-                MainApp.imageScreenLayout.remove_widget(chosenImage)
-                drawingImage.reload()
-                MainApp.imageScreenLayout.add_widget(chosenImage)
+                chosenImage.source = chosenFile
+                chosenImage.reload()
             renderCallback()
             sm.current = MAIN_SCREEN_ID
             sm.transition.direction = 'right'
