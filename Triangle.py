@@ -27,7 +27,6 @@ def obtainCenterOfHand(triangles):
         center = [-1,-1]
     return center
 
-
 class Triangle:
     fingerA = []
     fingerB = []

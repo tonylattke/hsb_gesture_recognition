@@ -1,24 +1,13 @@
 # Python Libraries
 import numpy as np  # Functions for images
 import cv2          # OpenCV
-import math         # Math operations
 
 # Our Libraries
-import colors_helpers as ch  # Colors helpers
+import geometry_helpers as gh
+import colors_helpers as ch
 import Triangle as th
 import FilipsModel as hfm
 import TonyModel as htm
-
-# Calculates the distance between points
-def distance(pointA, pointB):
-    return math.sqrt((pointB[0] - pointA[0]) ** 2 + (pointB[1] - pointA[1]) ** 2)
-
-# Calculates the angle between 3 Points
-def calculateAngle(start, end, far):
-    a = distance(start, end)
-    b = distance(far, start)
-    c = distance(end, far)
-    return math.acos((b ** 2 + c ** 2 - a ** 2) / (2 * b * c)) * 60
 
 # Image Processor
 class ImageProcessor:
@@ -112,7 +101,7 @@ def analyze(ip):
                 start = tuple(cnt[s][0])
                 end = tuple(cnt[e][0])
                 far = tuple(cnt[f][0])
-                angle = calculateAngle(start,end,far)
+                angle = gh.calculateAngle(start,end,far)
                 if angle <= 90:
                     count_defects += 1
                     triangle = th.Triangle(start,end,far)
@@ -124,10 +113,10 @@ def analyze(ip):
 
         handModel = hfm.FilipsModel(centerOfHand,triangles)
         ip.numberOfFingers = handModel.countOfFinger()
-        #handModel.getCenter()
+        handModel.getCenter()
         handModel.drawLines(drawing, ip.magenta, ip.lineThickness)
         handModel.drawDefects(drawing, ip.yellow, ip.defectInternRadius, ip.defectExternRadius)
-        handModel2 = htm.TonyModel(centerOfHand, triangles)
+        handModel2 = htm.TonyModel(handModel.center, triangles)
         handModel2.drawLines(drawing, ip.cyan, ip.lineThickness)
 
         # cv2.imshow('Contours', all_img)

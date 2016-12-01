@@ -21,7 +21,7 @@ class TonyModel:
             pass
         elif self.defects == 1:
             self.firstFinger = triangles[0].fingerA
-            self.lastDefect = triangles[0].fingerB
+            self.lastFinger = triangles[0].fingerB
         elif self.defects == 2:
             self.firstFinger = triangles[0].fingerA
             self.secondFinger = th.averagePoint(triangles[0].fingerB,triangles[1].fingerA)
