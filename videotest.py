@@ -84,8 +84,8 @@ class HandTracking:
         # Siempre
         while True:
             self.run()  # Procese la imagen
-            # self.interprete()  # Interprete eventos (clicks)
-            # self.updateMousePos()  # Mueve el cursor
+            self.interprete()  # Interprete eventos (clicks)
+            self.updateMousePos()  # Mueve el cursor
             if self.debugMode:
                 if cv2.waitKey(1) == 27: break
 
@@ -283,49 +283,59 @@ class HandTracking:
             pos += 20
 
             # ----------------------------------------------------------------------
-            # def updateMousePos(self):
-            #     pos = self.Data["cursor"]
-            # posPre = self.posPre
-            # npos = np.subtract(pos, posPre)
-            # self.posPre = pos
-            #
-            # if self.Data["fingers"] in [1]:
-            #     try:
-            #         elf.t.__stop.set()
-            #     except:
-            #         pass
-            #     # Thread para mover el cursor
-            #     self.t = threading.Thread(target=self.moveMouse, args=(npos))
-            #     self.t.start()
-            #
+
+    def updateMousePos(self):
+        pos = self.Data["cursor"]
+        posPre = self.posPre
+        npos = np.subtract(pos, posPre)
+        self.posPre = pos
+
+        if self.Data["fingers"] in [1]:
+            try:
+                self.t.__stop.set()
+            except:
+
+                pass
+            # Thread para mover el cursor
+            self.t = threading.Thread(target=self.moveMouse, args=(npos))
+            self.t.start()
+
             # ----------------------------------------------------------------------
-            # def interprete(self):
-            #     """Interpreta los eventos."""
-            #     cont = 3
-            # # Click Izquierdo, 5 dedos extendidos.
-            # if self.Data["fingers history"][:cont] == [5] * cont:
-            #     os.system("xdotool click 1")
-            #     self.Data["fingers history"] = [0]  # Elimina el historial de estado de los dedos.
-            # # Click Izquierdo, 3 dedos extendidos.
+
+    def interprete(self):
+        """Interpreta los eventos."""
+        cont = 3
+        # Click Izquierdo, 5 dedos extendidos.
+        if self.Data["fingers history"][:cont] == [4] * cont:
+            # os.system("xdotool key XF86AudioPlay")
+            self.Data["fingers history"] = [0]  # Elimina el historial de estado de los dedos.
+            # Click Izquierdo, 3 dedos extendidos.
             # elif self.Data["fingers history"][:cont] == [3] * cont:
             #     os.system("xdotool click 3")
             #     self.Data["fingers history"] = [0]
 
             # ----------------------------------------------------------------------
-            # def moveMouse(self, x, y):
-            #     mini = 10
-            # mul = 2
-            # x *= mul
-            # y *= mul
-            # # Un movimiento fluido...
-            # posy = lambda n: (y / x) * n  #
-            # stepp = 10
-            # # ... y la recorre en x cada 10px
-            # if x > 0:
-            #     for i in range(0, x, stepp): os.system("xdotool mousemove_relative -- %d %d" % (i, posy(i)))
-            # if x < 0:
-            #     for i in range(x, 0, stepp): os.system("xdotool mousemove_relative -- %d %d" % (i, posy(i)))
-            # time.sleep(0.2)  #
+
+    def moveMouse(self, x, y):
+        mini = 10
+
+        # Arbeitsflaechen wechseln
+        if x > 270:
+            os.system("xdotool set_desktop --relative 1")
+        if x < -270:
+            os.system("xdotool set_desktop --relative  -- -1")
+        # mul = 2
+        # x *= mul
+        # y *= mul
+        # # Un movimiento fluido...
+        # posy = lambda n: (y / x) * n  #
+        # stepp = 10
+        # # ... y la recorre en x cada 10px
+        # if x > 0:
+        #     for i in range(0, x, stepp): os.system("xdotool mousemove_relative -- %d %d" % (i, posy(i)))
+        # if x < 0:
+        #     for i in range(x, 0, stepp): os.system("xdotool mousemove_relative -- %d %d" % (i, posy(i)))
+        # time.sleep(0.2)
 
 
 if __name__ == '__main__':
