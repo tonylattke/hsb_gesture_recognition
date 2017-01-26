@@ -240,14 +240,22 @@ class MainApp(App):
 
         def changeHSVToGivenText(spinner, text):
             if text == "Skin":
-                Settings["upper"] = 0
-                Settings["filterUpS"] = 48
-                Settings["filterUpV"] = 80
+                writeHSVToSettings(20,255,255,0,48,80)
+            if text == "Red":
+                writeHSVToSettings(10,255,255,0,50,50)
+            if text == "Orange":
+                writeHSVToSettings(15,255,255,5,50,50)
+            if text == "Black":
+                writeHSVToSettings(180,255,35,0,0,0)
 
-                Settings["lower"] = 20
-                Settings["filterDownS"] = 255
-                Settings["filterDownV"] = 255
-                pickle.dump(Settings, open(".config", "w"))
+        def writeHSVToSettings(u,ups,upv,l,ds,dv):
+            Settings["upper"] = u
+            Settings["filterUpS"] = ups
+            Settings["filterUpV"] = upv
+            Settings["lower"] = l
+            Settings["filterDownS"] = ds
+            Settings["filterDownV"] = dv
+            pickle.dump(Settings, open(".config", "w"))
 
         spinner.bind(text=changeHSVToGivenText)
 
