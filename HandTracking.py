@@ -23,14 +23,20 @@ def addText(image, text, point):
     fontSize = 1.0
     cv2.putText(image, text, point, cv2.FONT_HERSHEY_PLAIN, fontSize, ch.colors['white'])
 
+
 # HandTracking Processor class
 class HandTracking:
     # Constructor
     def __init__(self):
         self.debugMode = True
 
-        #self.camera = cv2.VideoCapture(0)
-        self.camera = cv2.VideoCapture("test.mp4")
+        # Setting Camera
+        #self.camera = cv2.VideoCapture("test.mp4")
+        self.camera = cv2.VideoCapture(0)
+
+        # Resolution of camera
+        # self.camera.set(3, 1024)
+        # self.camera.set(4, 800)
 
         self.previousPosition = 0  # Get the relative position of mouse pointer
 
@@ -42,29 +48,14 @@ class HandTracking:
                      "fingers history": []
                      }
 
-        # Settings
-        try:
-            self.settings = pickle.load(open(".config", "r"))
-        except:
-            print "Config file not found."
-            exit()
-
         # Create model of the hand
         self.hand = hm.HandModel()
 
     # imageProcessing - Run the image processing
-    def imageProcessing(self, frame):
-        # Settings reload
-        try:
-            self.settings = pickle.load(open(".config", "r"))
-        except:
-            print "Config file not found."
-            exit()
-
+    def imageProcessing(self):
         self.hand.resetModel()
-
-        im = frame
-        
+        ret, im = self.camera.read()
+        im = cv2.flip(im, 1)
         self.imOrig = im.copy()
         self.imNoFilters = im.copy()
 
@@ -86,7 +77,6 @@ class HandTracking:
 
         # Recognition of contours
         contours, hierarchy = cv2.findContours(filter_, cv2.RETR_LIST, cv2.CHAIN_APPROX_NONE)
-
         # Filtering the contours
         allIdex = []
         for index in range(len(contours)):
@@ -163,18 +153,21 @@ class HandTracking:
 
             index_ += 1
 
-        yPos = 10
-        pos = 20
-        addText(self.imOrig, ("Angles less 90: " + str(self.Data["angles less 90"])), (yPos, pos))
-        pos += 20
-        addText(self.imOrig, ("Hulls: " + str(self.Data["hulls"])), (yPos, pos))
-        pos += 20
-        addText(self.imOrig, ("Defects: " + str(self.Data["defects"])), (yPos, pos))
-        pos += 20
-        addText(self.imOrig, ("Fingers: " + str(self.Data["fingers"])), (yPos, pos))
-        pos += 20
-        addText(self.imOrig, ("Fingers history: " + str(self.Data["fingers history"])), (yPos, pos))
+        # Show the information
+        if self.debugMode:
+            yPos = 10
+            pos = 20
+            addText(self.imOrig, ("Angles less 90: " + str(self.Data["angles less 90"])), (yPos, pos))
+            pos += 20
+            addText(self.imOrig, ("Hulls: " + str(self.Data["hulls"])), (yPos, pos))
+            pos += 20
+            addText(self.imOrig, ("Defects: " + str(self.Data["defects"])), (yPos, pos))
+            pos += 20
+            addText(self.imOrig, ("Fingers: " + str(self.Data["fingers"])), (yPos, pos))
+            pos += 20
+            addText(self.imOrig, ("Fingers history: " + str(self.Data["fingers history"])), (yPos, pos))
 
+        # Show the results
         cv2.imshow("HSB - Computational geometry - Lattke & Mindelis", self.imOrig)
 
     # ----------------------------------------------------------------------
@@ -185,10 +178,10 @@ class HandTracking:
         # UPPER = np.array([[10,255,255]], np.uint8)  # Rot obere Grenze
         # LOWER = np.array([[5,50,50]], np.uint8)  # Orange untere Grenze
         # UPPER = np.array([[15,255,255]], np.uint8)  # Orange obere Grenze
-        # LOWER = np.array([[0, 0, 0]], np.uint8)  # Schwarz untere Grenze
-        # UPPER = np.array([[180, 255, 35]], np.uint8)  # Schwarz obere Grenze
-        UPPER = np.array([self.settings["upper"], self.settings["filterUpS"], self.settings["filterUpV"]], np.uint8)
-        LOWER = np.array([self.settings["lower"], self.settings["filterDownS"], self.settings["filterDownV"]], np.uint8)
+        LOWER = np.array([[0, 0, 0]], np.uint8)  # Schwarz untere Grenze
+        UPPER = np.array([[180, 255, 35]], np.uint8)  # Schwarz obere Grenze
+        # UPPER = np.array([self.settings["upper"], self.settings["filterUpS"], self.settings["filterUpV"]], np.uint8)
+        # LOWER = np.array([self.settings["lower"], self.settings["filterDownS"], self.settings["filterDownV"]], np.uint8)
         hsv_im = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
         filter_im = cv2.inRange(hsv_im, LOWER, UPPER)
         return filter_im
@@ -237,20 +230,27 @@ class HandTracking:
                 os.system("xdotool mousemove_relative -- %d %d" % (i, mh.smoothPositionY(x, y, i)))
         time.sleep(0.2)
 
-def StartImageProcessing():
+
+# Main
+if __name__ == '__main__':
+    tracking = HandTracking()
+
     # Main loop
     while True:
-        ret, im = tracking.camera.read()
+        # Settings reload
+        try:
+            tracking.settings = pickle.load(open(".config", "r"))
+        except:
+            print "Config file not found."
+            exit()
 
-        tracking.imageProcessing(im)
+        tracking.imageProcessing()
         tracking.actionMouse()
         tracking.updateMousePosition()
         # Exit - Key q
-        if cv2.waitKey(1) & 0xFF == ord('q') | cv2.waitKey(1) == 27: break
+        if cv2.waitKey(1) & 0xFF == ord('q') | cv2.waitKey(1) == 27: 
+            break
 
-def StopImageProcessing():
     # End
     tracking.camera.release()
     cv2.destroyAllWindows()
-
-tracking = HandTracking()
