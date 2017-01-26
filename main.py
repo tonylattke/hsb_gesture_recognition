@@ -2,17 +2,19 @@
 
 # Python Libraries
 import os
+import cv2
 from kivy.app import App
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.image import Image
-from kivy.clock import Clock
 from kivy.uix.button import Button
 from kivy.config import Config
 from kivy.lang import Builder
 from kivy.uix.label import Label
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.uix.slider import Slider
+from kivy.clock import Clock
+from kivy.graphics.texture import Texture
 
 # Our Libraries
 import ImageProcessor as ip
@@ -21,8 +23,10 @@ import ImageProcessor as ip
 imageProcessor = ip.ImageProcessor()
 chosenImage = Image(source='images/hand.jpg', pos=(500, 200), size=(200, 200))
 drawingImage = Image(source='drawing.png', pos=(500, 200), size=(200, 200))
-widthCropSlider = Slider(min=10, max=(chosenImage._coreimage._size[0] / 100 * 90), value=(chosenImage._coreimage._size[0] / 100 * 90), steps=1)
-heightCropSlider = Slider(min=10, max=(chosenImage._coreimage._size[1] / 100 * 90), value=(chosenImage._coreimage._size[1] / 100 * 90), steps=1)
+widthCropSlider = Slider(min=10, max=(chosenImage._coreimage._size[0] / 100 * 90),
+                         value=(chosenImage._coreimage._size[0] / 100 * 90), steps=1)
+heightCropSlider = Slider(min=10, max=(chosenImage._coreimage._size[1] / 100 * 90),
+                          value=(chosenImage._coreimage._size[1] / 100 * 90), steps=1)
 xCropSlider = Slider(min=0, max=(chosenImage._coreimage._size[0]), value=0, steps=1)
 yCropSlider = Slider(min=0, max=(chosenImage._coreimage._size[1]), value=0, steps=1)
 amountOfFingersLabel = Label(text='')
@@ -37,6 +41,7 @@ chosenFile = ''
 MAIN_SCREEN_ID = 'main_screen'
 FILE_CHOOSER_SCREEN_ID = 'filechooser_screen'
 IMAGE_SCREEN_ID = "image_screen"
+VIDEO_SCREEN_ID = "video_screen"
 
 # Settings
 Config.set('graphics', 'width', '1360')
@@ -59,6 +64,7 @@ class MainApp(App):
     mainScreenLayout = BoxWidget(orientation='vertical', size=(1360, 640))
     fileChooserScreenLayout = FloatWidget(size=(1360, 640))
     imageScreenLayout = BoxWidget(orientation='horizontal', size=(1360, 640))
+    videoScreenLayout = BoxWidget(orientation='horizontal', size=(1360, 640))
 
     # ------------
 
@@ -68,6 +74,7 @@ class MainApp(App):
         mainScreen = MainScreen(name=MAIN_SCREEN_ID)
         fileChooserScreen = FileChooserScreen(name=FILE_CHOOSER_SCREEN_ID)
         imageScreen = ImageScreen(name=IMAGE_SCREEN_ID)
+        videoScreen = VideoScreen(name=VIDEO_SCREEN_ID)
         # ------------
 
         # --- Construct main Screen ---
@@ -82,10 +89,15 @@ class MainApp(App):
         self.constructImageScreen(self.imageScreenLayout)
         # ------------
 
+        # --- Construct video Screen ---
+        self.constructVideoScreen(self.videoScreenLayout)
+        # ------------
+
         # --- Add layouts to screens ---
         mainScreen.add_widget(self.mainScreenLayout)
         fileChooserScreen.add_widget(self.fileChooserScreenLayout)
         imageScreen.add_widget(self.imageScreenLayout)
+        videoScreen.add_widget(self.videoScreenLayout)
 
         # ------------
 
@@ -93,6 +105,7 @@ class MainApp(App):
         sm.add_widget(mainScreen)
         sm.add_widget(fileChooserScreen)
         sm.add_widget(imageScreen)
+        sm.add_widget(videoScreen)
         # ------------
 
         return sm
@@ -108,6 +121,11 @@ class MainApp(App):
                                            size_hint=(.5, 1))
         changeToImageScreenButton.bind(on_press=MainApp.changeToImageScreen)
         mainScreenLayout.add_widget(changeToImageScreenButton)
+
+        changeToVideoScreenButton = Button(text="Show Video",
+                                           size_hint=(.5, 1))
+        changeToVideoScreenButton.bind(on_press=MainApp.changeToVideoScreen)
+        mainScreenLayout.add_widget(changeToVideoScreenButton)
 
     # --- Constructs the file Chooser Screen Layout
     def constructFileChooserScreen(self, fileChooserScreenLayout):
@@ -169,6 +187,47 @@ class MainApp(App):
         imageScreenLayout.add_widget(chosenImage)
         imageScreenLayout.add_widget(drawingImage)
 
+    # --- Constructs the Video Screen Layout
+    def constructVideoScreen(self, videoScreenLayout):
+        changeToMainButton = Button(text="Go back to main",
+                                    size_hint=(.2, .1),
+                                    pos_hint={'center_x': .5, 'center_y': 0.95})
+        changeToMainButton.bind(on_press=MainApp.changeToMainScreenFromVideo)
+        videoScreenLayout.add_widget(changeToMainButton)
+
+        self.img1 = Image(source='images/1.jpg')
+        videoScreenLayout.add_widget(self.img1)
+        # opencv2 stuffs
+        self.capture = cv2.VideoCapture(0)
+        ret, frame = self.capture.read()
+        Clock.schedule_interval(self.update, 1.0 / 33.0)
+
+    def update(self, dt):
+        # display image from cam in opencv window
+        ret, frame = self.capture.read()
+        # convert it to texture
+        buf1 = cv2.flip(frame, 0)
+        buf = buf1.tostring()
+        texture1 = Texture.create(size=(frame.shape[1], frame.shape[0]), colorfmt='bgr')
+        texture1.blit_buffer(buf, colorfmt='bgr', bufferfmt='ubyte')
+        # display image from the texture
+        self.img1.texture = texture1
+        # def CreateImage(self, (height, width), bits=np.uint8, channels=3, color=(0, 0, 0)): # (cv.GetSize(frame), 8, 3)
+        #     """Create new image(numpy array) filled with certain color in RGB"""
+        #     # Create black blank image
+        #     if bits == 8:
+        #         bits = np.uint8
+        #     elif bits == 32:
+        #         bits = np.float32
+        #     elif bits == 64:
+        #         bits = np.float64
+        #     image = np.zeros((height, width, channels), bits)
+        #     if color != (0, 0, 0):
+        #         # Fill image with color
+        #         image[:] = color
+        #     return image
+
+
     # --- Change to file chooser screen
     def changeToFileChooserScreen(root):
         sm.current = FILE_CHOOSER_SCREEN_ID
@@ -178,6 +237,16 @@ class MainApp(App):
     def changeToImageScreen(root):
         sm.current = IMAGE_SCREEN_ID
         sm.transition.direction = 'up'
+
+    # --- Change to image screen
+    def changeToVideoScreen(root):
+        sm.current = VIDEO_SCREEN_ID
+        sm.transition.direction = 'right'
+
+    # --- Change to main screen from viedeo
+    def changeToMainScreenFromVideo(root):
+        sm.current = MAIN_SCREEN_ID
+        sm.transition.direction = 'left'
 
     # --- Change to main screen from file chooser
     def changeToMainScreenFromFileChooser(root):
@@ -237,6 +306,10 @@ class MainScreen(Screen):
 
 
 class ImageScreen(Screen):
+    pass
+
+
+class VideoScreen(Screen):
     pass
 
 
