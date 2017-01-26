@@ -208,6 +208,7 @@ class MainApp(App):
     def update(self, dt):
         # display image from cam in opencv window
         ret, frame = self.capture.read()
+        frame = cv2.flip(frame,-1)
         result = self.handTrackingSystem.imageProcessing(frame)
         self.handTrackingSystem.actionMouse()
         self.handTrackingSystem.updateMousePosition()

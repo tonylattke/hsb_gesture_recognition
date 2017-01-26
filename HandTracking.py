@@ -15,6 +15,14 @@ import HandModel as hm
 import colors_helpers as ch
 import math_helpers as mh
 
+# addText - Add text in an image
+# image : Target image
+# text : Text
+# point : Coordinate
+def addText(image, text, point):
+    fontSize = 1.0
+    cv2.putText(image, text, point, cv2.FONT_HERSHEY_PLAIN, fontSize, ch.colors['white'])
+
 # HandTracking Processor class
 class HandTracking:
     # Constructor
@@ -54,7 +62,6 @@ class HandTracking:
 
         im = frame
         
-        im = cv2.flip(im, 1)
         self.imOrig = im.copy()
         self.imNoFilters = im.copy()
 
@@ -152,6 +159,18 @@ class HandTracking:
             self.imOrig = cv2.add(self.imOrig, tempIm)
 
             index_ += 1
+
+        yPos = 10
+        pos = 20
+        addText(self.imOrig, ("Angles less 90: " + str(self.Data["angles less 90"])), (yPos, pos))
+        pos += 20
+        addText(self.imOrig, ("Hulls: " + str(self.Data["hulls"])), (yPos, pos))
+        pos += 20
+        addText(self.imOrig, ("Defects: " + str(self.Data["defects"])), (yPos, pos))
+        pos += 20
+        addText(self.imOrig, ("Fingers: " + str(self.Data["fingers"])), (yPos, pos))
+        pos += 20
+        addText(self.imOrig, ("Fingers history: " + str(self.Data["fingers history"])), (yPos, pos))
 
         return self.imOrig
 
