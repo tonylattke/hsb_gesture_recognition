@@ -2,7 +2,7 @@
 
 # Python Libraries
 import os
-import cv2
+import pickle
 from kivy.app import App
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.floatlayout import FloatLayout
@@ -13,8 +13,7 @@ from kivy.lang import Builder
 from kivy.uix.label import Label
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.uix.slider import Slider
-from kivy.clock import Clock
-from kivy.graphics.texture import Texture
+from kivy.uix.spinner import Spinner
 
 # Our Libraries
 import ImageProcessor as ip
@@ -31,6 +30,7 @@ heightCropSlider = Slider(min=10, max=(chosenImage._coreimage._size[1] / 100 * 9
 xCropSlider = Slider(min=0, max=(chosenImage._coreimage._size[0]), value=0, steps=1)
 yCropSlider = Slider(min=0, max=(chosenImage._coreimage._size[1]), value=0, steps=1)
 amountOfFingersLabel = Label(text='')
+Settings = pickle.load(open(".config", "r"))
 
 # Create the screen manager
 sm = ScreenManager()
@@ -191,11 +191,68 @@ class MainApp(App):
     def constructVideoScreen(self, videoScreenLayout):
         changeToMainButton = Button(text="Go back to main",
                                     size_hint=(.2, .1),
-                                    pos_hint={'center_x': .5, 'center_y': 0.95})
+                                    pos_hint={'center_x': .5, 'center_y': 0.7})
         changeToMainButton.bind(on_press=MainApp.changeToMainScreenFromVideo)
-        videoScreenLayout.add_widget(changeToMainButton)
+        firstButtonLayout = BoxLayout(orientation='vertical', size_hint=(.4, .6),
+                                 pos_hint={'center_x': 0.1, 'center_y': 0.6})
 
+        blurSliderLabel = Label(text='blur slider')
+        blurSlider = Slider(min=0,
+                            max=255,
+                            value=Settings["blur"],
+                            step=1)
+        blurSlider.bind(value=MainApp.onVideoBlurSliderValueChange)
 
+        firstButtonLayout.add_widget(changeToMainButton)
+
+        firstButtonLayout.add_widget(blurSliderLabel)
+        firstButtonLayout.add_widget(blurSlider)
+
+        erodeSliderLabel = Label(text='erode slider')
+        erodeSlider = Slider(min=0,
+                             max=255,
+                             value=0,
+                             step=1)
+        erodeSlider.bind(value=MainApp.onVideoErodeSliderValueChange)
+
+        firstButtonLayout.add_widget(erodeSliderLabel)
+        firstButtonLayout.add_widget(erodeSlider)
+
+        dilateSliderLabel = Label(text='dilate slider')
+        dilateSlider = Slider(min=0,
+                              max=255,
+                              value=0,
+                              step=1)
+        dilateSlider.bind(value=MainApp.onVideoDilateSliderValueChange)
+
+        firstButtonLayout.add_widget(dilateSliderLabel)
+        firstButtonLayout.add_widget(dilateSlider)
+
+        spinner = Spinner(
+            # default value shown
+            text='Choose color',
+            # available values
+            values=('Skin', 'Red', 'Orange', 'Black'),
+            # just for positioning in our example
+            size_hint=(None, None),
+            size=(100, 44),
+            pos_hint={'center_x': .5, 'center_y': .5})
+
+        def changeHSVToGivenText(spinner, text):
+            if text == "Skin":
+                Settings["upper"] = 0
+                Settings["filterUpS"] = 48
+                Settings["filterUpV"] = 80
+
+                Settings["lower"] = 20
+                Settings["filterDownS"] = 255
+                Settings["filterDownV"] = 255
+                pickle.dump(Settings, open(".config", "w"))
+
+        spinner.bind(text=changeHSVToGivenText)
+
+        firstButtonLayout.add_widget(spinner)
+        videoScreenLayout.add_widget(firstButtonLayout)
 
     # --- Change to file chooser screen
     def changeToFileChooserScreen(root):
@@ -231,6 +288,50 @@ class MainApp(App):
     def onBlurSliderValueChange(instance, value):
         imageProcessor.blurringLevel = int(value)
         renderCallback()
+
+    # --- Setting the video blur slider value
+    def onVideoBlurSliderValueChange(instance, value):
+        Settings["blur"] = int(value) + 1
+        pickle.dump(Settings, open(".config", "w"))
+
+    # def onChange_fuS(self, value):
+    #     Settings["filterUpS"] = value
+    #     pickle.dump(self.Vars, open(".config", "w"))
+    #
+    # # ----------------------------------------------------------------------
+    # def onChange_fdS(self, value):
+    #     self.Vars["filterDownS"] = value
+    #     pickle.dump(self.Vars, open(".config", "w"))
+    #
+    # # ----------------------------------------------------------------------
+    # def onChange_fuV(self, value):
+    #     self.Vars["filterUpV"] = value
+    #     pickle.dump(self.Vars, open(".config", "w"))
+    #
+    # # ----------------------------------------------------------------------
+    # def onChange_fdV(self, value):
+    #     self.Vars["filterDownV"] = value
+    #     pickle.dump(self.Vars, open(".config", "w"))
+    #
+    # # ----------------------------------------------------------------------
+    # def onChange_upper(self, value):
+    #     self.Vars["upper"] = value
+    #     pickle.dump(self.Vars, open(".config", "w"))
+    #
+    # # ----------------------------------------------------------------------
+    # def onChange_lower(self, value):
+    #     self.Vars["lower"] = value
+    #     pickle.dump(self.Vars, open(".config", "w"))
+
+    # ----------------------------------------------------------------------
+    def onVideoErodeSliderValueChange(instance, value):
+        Settings["erode"] = value + 1
+        pickle.dump(Settings, open(".config", "w"))
+
+    # ----------------------------------------------------------------------
+    def onVideoDilateSliderValueChange(instance, value):
+        Settings["diilate"] = value + 1
+        pickle.dump(Settings, open(".config", "w"))
 
     # --- Setting the x crop slider value
     def onXCropSliderValueChange(instance, value):
