@@ -18,6 +18,7 @@ from kivy.graphics.texture import Texture
 
 # Our Libraries
 import ImageProcessor as ip
+import HandTracking as ht
 
 # Static variables
 imageProcessor = ip.ImageProcessor()
@@ -46,7 +47,6 @@ VIDEO_SCREEN_ID = "video_screen"
 # Settings
 Config.set('graphics', 'width', '1360')
 Config.set('graphics', 'height', '1024')
-
 
 # Float Widget
 class FloatWidget(FloatLayout):
@@ -199,15 +199,22 @@ class MainApp(App):
         videoScreenLayout.add_widget(self.img1)
         # opencv2 stuffs
         self.capture = cv2.VideoCapture(0)
+        #self.capture = cv2.VideoCapture("test.mp4")
+        self.handTrackingSystem = ht.HandTracking()
+
         ret, frame = self.capture.read()
         Clock.schedule_interval(self.update, 1.0 / 33.0)
 
     def update(self, dt):
         # display image from cam in opencv window
         ret, frame = self.capture.read()
-        # convert it to texture
-        buf1 = cv2.flip(frame, 0)
-        buf = buf1.tostring()
+        result = self.handTrackingSystem.imageProcessing(frame)
+        self.handTrackingSystem.actionMouse()
+        self.handTrackingSystem.updateMousePosition()
+        try:
+            buf = result.tostring()
+        except:
+            buf = frame.tostring()
         texture1 = Texture.create(size=(frame.shape[1], frame.shape[0]), colorfmt='bgr')
         texture1.blit_buffer(buf, colorfmt='bgr', bufferfmt='ubyte')
         # display image from the texture
