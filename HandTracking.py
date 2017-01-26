@@ -178,10 +178,10 @@ class HandTracking:
         # UPPER = np.array([[10,255,255]], np.uint8)  # Rot obere Grenze
         # LOWER = np.array([[5,50,50]], np.uint8)  # Orange untere Grenze
         # UPPER = np.array([[15,255,255]], np.uint8)  # Orange obere Grenze
-        LOWER = np.array([[0, 0, 0]], np.uint8)  # Schwarz untere Grenze
-        UPPER = np.array([[180, 255, 35]], np.uint8)  # Schwarz obere Grenze
-        # UPPER = np.array([self.settings["upper"], self.settings["filterUpS"], self.settings["filterUpV"]], np.uint8)
-        # LOWER = np.array([self.settings["lower"], self.settings["filterDownS"], self.settings["filterDownV"]], np.uint8)
+        # LOWER = np.array([[0, 0, 0]], np.uint8)  # Schwarz untere Grenze
+        # UPPER = np.array([[180, 255, 35]], np.uint8)  # Schwarz obere Grenze
+        UPPER = np.array([self.settings["upper"], self.settings["filterUpS"], self.settings["filterUpV"]], np.uint8)
+        LOWER = np.array([self.settings["lower"], self.settings["filterDownS"], self.settings["filterDownV"]], np.uint8)
         hsv_im = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
         filter_im = cv2.inRange(hsv_im, LOWER, UPPER)
         return filter_im
@@ -248,7 +248,7 @@ if __name__ == '__main__':
         tracking.actionMouse()
         tracking.updateMousePosition()
         # Exit - Key q
-        if cv2.waitKey(1) & 0xFF == ord('q') | cv2.waitKey(1) == 27: 
+        if cv2.waitKey(1) & 0xFF == ord('q') | cv2.waitKey(1) == 27:
             break
 
     # End

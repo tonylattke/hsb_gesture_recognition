@@ -3,6 +3,8 @@
 # Python Libraries
 import os
 import pickle
+import subprocess
+import multiprocessing
 from kivy.app import App
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.floatlayout import FloatLayout
@@ -47,6 +49,7 @@ VIDEO_SCREEN_ID = "video_screen"
 # Settings
 Config.set('graphics', 'width', '1360')
 Config.set('graphics', 'height', '1024')
+
 
 # Float Widget
 class FloatWidget(FloatLayout):
@@ -193,8 +196,12 @@ class MainApp(App):
                                     size_hint=(.2, .1),
                                     pos_hint={'center_x': .5, 'center_y': 0.7})
         changeToMainButton.bind(on_press=MainApp.changeToMainScreenFromVideo)
+
         firstButtonLayout = BoxLayout(orientation='vertical', size_hint=(.4, .6),
-                                 pos_hint={'center_x': 0.1, 'center_y': 0.6})
+                                      pos_hint={'center_x': 0.1, 'center_y': 0.6})
+
+        secondButtonLayout = BoxLayout(orientation='vertical', size_hint=(.4, .6),
+                                       pos_hint={'center_x': 0.1, 'center_y': 0.6})
 
         blurSliderLabel = Label(text='blur slider')
         blurSlider = Slider(min=0,
@@ -240,27 +247,89 @@ class MainApp(App):
 
         def changeHSVToGivenText(spinner, text):
             if text == "Skin":
-                writeHSVToSettings(20,255,255,0,48,80)
+                writeHSVToSettings(20, 255, 255, 0, 48, 80)
             if text == "Red":
-                writeHSVToSettings(10,255,255,0,50,50)
+                writeHSVToSettings(10, 255, 255, 0, 50, 50)
             if text == "Orange":
-                writeHSVToSettings(15,255,255,5,50,50)
+                writeHSVToSettings(15, 255, 255, 5, 50, 50)
             if text == "Black":
-                writeHSVToSettings(180,255,35,0,0,0)
+                writeHSVToSettings(180, 255, 35, 0, 0, 0)
 
-        def writeHSVToSettings(u,ups,upv,l,ds,dv):
+        def writeHSVToSettings(u, ups, upv, l, ds, dv):
             Settings["upper"] = u
+            pickle.dump(Settings, open(".config", "w"))
             Settings["filterUpS"] = ups
+            pickle.dump(Settings, open(".config", "w"))
             Settings["filterUpV"] = upv
+            pickle.dump(Settings, open(".config", "w"))
             Settings["lower"] = l
+            pickle.dump(Settings, open(".config", "w"))
             Settings["filterDownS"] = ds
+            pickle.dump(Settings, open(".config", "w"))
             Settings["filterDownV"] = dv
             pickle.dump(Settings, open(".config", "w"))
 
         spinner.bind(text=changeHSVToGivenText)
 
         firstButtonLayout.add_widget(spinner)
+
+        upperHueSliderLabel = Label(text='upper hue slider')
+        upperHueSlider = Slider(min=0,
+                                max=255,
+                                value=Settings["upper"],
+                                step=1)
+        upperHueSlider.bind(value=MainApp.onVideoUpperHueChange)
+        secondButtonLayout.add_widget(upperHueSliderLabel)
+        secondButtonLayout.add_widget(upperHueSlider)
+
+        upperSaturationSliderLabel = Label(text='upper saturation slider')
+        upperSaturationSlider = Slider(min=0,
+                                       max=255,
+                                       value=Settings["filterUpS"],
+                                       step=1)
+        upperSaturationSlider.bind(value=MainApp.onVideoUpperSaturationChange)
+        secondButtonLayout.add_widget(upperSaturationSliderLabel)
+        secondButtonLayout.add_widget(upperSaturationSlider)
+
+        upperValueSliderLabel = Label(text='upper value slider')
+        upperValueSlider = Slider(min=0,
+                                  max=255,
+                                  value=Settings["filterUpV"],
+                                  step=1)
+        upperValueSlider.bind(value=MainApp.onVideoUpperValueChange)
+        secondButtonLayout.add_widget(upperValueSliderLabel)
+        secondButtonLayout.add_widget(upperValueSlider)
+
+        downHueSliderLabel = Label(text='down hue slider')
+        downHueSlider = Slider(min=0,
+                               max=255,
+                               value=Settings["lower"],
+                               step=1)
+        downHueSlider.bind(value=MainApp.onVideoDownHueChange)
+        secondButtonLayout.add_widget(downHueSliderLabel)
+        secondButtonLayout.add_widget(downHueSlider)
+
+        downSaturationSliderLabel = Label(text='down saturation slider')
+        downSaturationSlider = Slider(min=0,
+                                      max=255,
+                                      value=Settings["filterDownS"],
+                                      step=1)
+        downSaturationSlider.bind(value=MainApp.onVideoDownSaturationChange)
+        secondButtonLayout.add_widget(downSaturationSliderLabel)
+        secondButtonLayout.add_widget(downSaturationSlider)
+
+        downValueSliderLabel = Label(text='down value slider')
+        downValueSlider = Slider(min=0,
+                                 max=255,
+                                 value=Settings["filterDownV"],
+                                 step=1)
+        downValueSlider.bind(value=MainApp.onVideoDownValueChange)
+        secondButtonLayout.add_widget(downValueSliderLabel)
+        secondButtonLayout.add_widget(downValueSlider)
+
+
         videoScreenLayout.add_widget(firstButtonLayout)
+        videoScreenLayout.add_widget(secondButtonLayout)
 
     # --- Change to file chooser screen
     def changeToFileChooserScreen(root):
@@ -276,11 +345,13 @@ class MainApp(App):
     def changeToVideoScreen(root):
         sm.current = VIDEO_SCREEN_ID
         sm.transition.direction = 'right'
+        os.system("python HandTracking.py &")
 
     # --- Change to main screen from viedeo
     def changeToMainScreenFromVideo(root):
         sm.current = MAIN_SCREEN_ID
         sm.transition.direction = 'left'
+        os.system("pkill -9 -f HandTracking.py")
 
     # --- Change to main screen from file chooser
     def changeToMainScreenFromFileChooser(root):
@@ -302,43 +373,43 @@ class MainApp(App):
         Settings["blur"] = int(value) + 1
         pickle.dump(Settings, open(".config", "w"))
 
-    # def onChange_fuS(self, value):
-    #     Settings["filterUpS"] = value
-    #     pickle.dump(self.Vars, open(".config", "w"))
-    #
-    # # ----------------------------------------------------------------------
-    # def onChange_fdS(self, value):
-    #     self.Vars["filterDownS"] = value
-    #     pickle.dump(self.Vars, open(".config", "w"))
-    #
-    # # ----------------------------------------------------------------------
-    # def onChange_fuV(self, value):
-    #     self.Vars["filterUpV"] = value
-    #     pickle.dump(self.Vars, open(".config", "w"))
-    #
-    # # ----------------------------------------------------------------------
-    # def onChange_fdV(self, value):
-    #     self.Vars["filterDownV"] = value
-    #     pickle.dump(self.Vars, open(".config", "w"))
-    #
-    # # ----------------------------------------------------------------------
-    # def onChange_upper(self, value):
-    #     self.Vars["upper"] = value
-    #     pickle.dump(self.Vars, open(".config", "w"))
-    #
-    # # ----------------------------------------------------------------------
-    # def onChange_lower(self, value):
-    #     self.Vars["lower"] = value
-    #     pickle.dump(self.Vars, open(".config", "w"))
+    def onVideoUpperSaturationChange(self, value):
+        Settings["filterUpS"] = value
+        pickle.dump(Settings, open(".config", "w"))
+
+    # ----------------------------------------------------------------------
+    def onVideoDownSaturationChange(self, value):
+        Settings["filterDownS"] = value
+        pickle.dump(Settings, open(".config", "w"))
+
+    # ----------------------------------------------------------------------
+    def onVideoUpperValueChange(self, value):
+        Settings["filterUpV"] = value
+        pickle.dump(Settings, open(".config", "w"))
+
+    # ----------------------------------------------------------------------
+    def onVideoDownValueChange(self, value):
+        Settings["filterDownV"] = value
+        pickle.dump(Settings, open(".config", "w"))
+
+    # ----------------------------------------------------------------------
+    def onVideoUpperHueChange(self, value):
+        Settings["upper"] = value
+        pickle.dump(Settings, open(".config", "w"))
+
+    # ----------------------------------------------------------------------
+    def onVideoDownHueChange(self, value):
+        Settings["lower"] = value
+        pickle.dump(Settings, open(".config", "w"))
 
     # ----------------------------------------------------------------------
     def onVideoErodeSliderValueChange(instance, value):
-        Settings["erode"] = value + 1
+        Settings["erode"] = int(value) + 1
         pickle.dump(Settings, open(".config", "w"))
 
     # ----------------------------------------------------------------------
     def onVideoDilateSliderValueChange(instance, value):
-        Settings["diilate"] = value + 1
+        Settings["diilate"] = int(value) + 1
         pickle.dump(Settings, open(".config", "w"))
 
     # --- Setting the x crop slider value
@@ -417,4 +488,5 @@ class FileChooserWidget(FloatLayout):
 
 # Run app
 fi = MainApp()
-fi.run()
+p = multiprocessing.Process(target=fi.run())
+p.start()
