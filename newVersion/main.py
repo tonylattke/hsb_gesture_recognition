@@ -40,7 +40,7 @@ class HandTracking:
         self.debugMode = True
 
         # Setting Camera
-        # self.camera = cv2.VideoCapture("test.mp4")
+        #self.camera = cv2.VideoCapture("test.mp4")
         self.camera = cv2.VideoCapture(0)
 
         # Resolution of camera
