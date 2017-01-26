@@ -195,45 +195,6 @@ class MainApp(App):
         changeToMainButton.bind(on_press=MainApp.changeToMainScreenFromVideo)
         videoScreenLayout.add_widget(changeToMainButton)
 
-        self.img1 = Image(source='images/1.jpg')
-        videoScreenLayout.add_widget(self.img1)
-        # opencv2 stuffs
-        self.capture = cv2.VideoCapture(0)
-        #self.capture = cv2.VideoCapture("test.mp4")
-        self.handTrackingSystem = ht.HandTracking()
-
-        ret, frame = self.capture.read()
-        Clock.schedule_interval(self.update, 1.0 / 33.0)
-
-    def update(self, dt):
-        # display image from cam in opencv window
-        ret, frame = self.capture.read()
-        frame = cv2.flip(frame,-1)
-        result = self.handTrackingSystem.imageProcessing(frame)
-        self.handTrackingSystem.actionMouse()
-        self.handTrackingSystem.updateMousePosition()
-        try:
-            buf = result.tostring()
-        except:
-            buf = frame.tostring()
-        texture1 = Texture.create(size=(frame.shape[1], frame.shape[0]), colorfmt='bgr')
-        texture1.blit_buffer(buf, colorfmt='bgr', bufferfmt='ubyte')
-        # display image from the texture
-        self.img1.texture = texture1
-        # def CreateImage(self, (height, width), bits=np.uint8, channels=3, color=(0, 0, 0)): # (cv.GetSize(frame), 8, 3)
-        #     """Create new image(numpy array) filled with certain color in RGB"""
-        #     # Create black blank image
-        #     if bits == 8:
-        #         bits = np.uint8
-        #     elif bits == 32:
-        #         bits = np.float32
-        #     elif bits == 64:
-        #         bits = np.float64
-        #     image = np.zeros((height, width, channels), bits)
-        #     if color != (0, 0, 0):
-        #         # Fill image with color
-        #         image[:] = color
-        #     return image
 
 
     # --- Change to file chooser screen
