@@ -242,11 +242,12 @@ if __name__ == '__main__':
             tracking.settings = pickle.load(open(".config", "r"))
         except:
             print "Config file not found."
-            exit()
+            # exit()
 
         tracking.imageProcessing()
-        tracking.actionMouse()
-        tracking.updateMousePosition()
+        if tracking.settings["mouseOff"]:
+            tracking.actionMouse()
+            tracking.updateMousePosition()
         # Exit - Key q
         if cv2.waitKey(1) & 0xFF == ord('q') | cv2.waitKey(1) == 27:
             break

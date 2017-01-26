@@ -3,7 +3,6 @@
 # Python Libraries
 import os
 import pickle
-import subprocess
 import multiprocessing
 from kivy.app import App
 from kivy.uix.boxlayout import BoxLayout
@@ -16,6 +15,7 @@ from kivy.uix.label import Label
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.uix.slider import Slider
 from kivy.uix.spinner import Spinner
+from kivy.uix.checkbox import CheckBox
 
 # Our Libraries
 import ImageProcessor as ip
@@ -273,6 +273,14 @@ class MainApp(App):
 
         firstButtonLayout.add_widget(spinner)
 
+        checkBoxLabel = Label(text='upper hue slider')
+        checkBox = CheckBox()
+        checkBox.bind(active=MainApp.onVideoMouseSwitchValueChange)
+
+        firstButtonLayout.add_widget(checkBoxLabel)
+        firstButtonLayout.add_widget(checkBox)
+
+
         upperHueSliderLabel = Label(text='upper hue slider')
         upperHueSlider = Slider(min=0,
                                 max=255,
@@ -410,6 +418,10 @@ class MainApp(App):
     # ----------------------------------------------------------------------
     def onVideoDilateSliderValueChange(instance, value):
         Settings["diilate"] = int(value) + 1
+        pickle.dump(Settings, open(".config", "w"))
+
+    def onVideoMouseSwitchValueChange(instance, value):
+        Settings["mouseOff"] = bool(value)
         pickle.dump(Settings, open(".config", "w"))
 
     # --- Setting the x crop slider value
