@@ -199,6 +199,15 @@ class HandTracking:
             os.system("xdotool click 3")
             self.Data["fingers history"] = [0]  # Clear history
 
+    # actionMouse - Action with mouse
+    def actionMusic(self):
+        # Times of repeated number of fingers
+        times = 10
+        if self.Data["fingers history"][:times] == [5] * times:
+            os.system("xdotool key XF86AudioPlay")
+            self.Data["fingers history"] = [0]  # Clear history
+
+
     # updateMousePosition - Update the position of the mouse pointer
     def updateMousePosition(self):
         currentPosition = self.hand.centerOfHand
@@ -231,6 +240,32 @@ class HandTracking:
         time.sleep(0.2)
 
 
+    # switch workspaces
+    def updateWorkspacePosition(self):
+        currentPosition = self.hand.centerOfHand
+        if currentPosition is not None:
+            previousPosition = self.previousPosition
+            newPosition = np.subtract(currentPosition, previousPosition)
+            self.previousPosition = currentPosition
+
+            if self.Data["fingers"] in [1]:
+                try:
+                    self.t.__stop.set()
+                except:
+                    pass
+                # Thread to update the position of mouse
+                self.t = threading.Thread(target=self.moveWorkspace, args=(newPosition))
+                self.t.start()
+
+    # moveMouse - Move the mouse pointer
+    def moveWorkspace(self, x, y):
+        print x
+        if x > 100:
+            os.system("xdotool set_desktop --relative 1")
+        if x < -100:
+            os.system("xdotool set_desktop --relative  -- -1")
+
+
 # Main
 if __name__ == '__main__':
     tracking = HandTracking()
@@ -245,9 +280,15 @@ if __name__ == '__main__':
             # exit()
 
         tracking.imageProcessing()
-        if tracking.settings["mouseOn"]:
+        if tracking.settings["actionMouse"]:
             tracking.actionMouse()
+        if tracking.settings["mouseOn"]:
             tracking.updateMousePosition()
+        if tracking.settings["switchWorkspace"]:
+            tracking.updateWorkspacePosition()
+        if tracking.settings["controlMusic"]:
+            tracking.actionMusic()
+
         # Exit - Key q
         if cv2.waitKey(1) & 0xFF == ord('q') | cv2.waitKey(1) == 27:
             break

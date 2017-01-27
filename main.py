@@ -272,12 +272,33 @@ class MainApp(App):
 
         firstButtonLayout.add_widget(spinner)
 
-        checkBoxLabel = Label(text='Mouse on', value=Settings["mouseOn"])
-        checkBox = CheckBox()
-        checkBox.bind(active=MainApp.onVideoMouseSwitchValueChange)
+        checkBoxMouseLabel = Label(text='Mouse on', value=Settings["mouseOn"])
+        checkBoxMouse = CheckBox()
+        checkBoxMouse.bind(active=MainApp.onVideoMouseSwitchValueChange)
 
-        firstButtonLayout.add_widget(checkBoxLabel)
-        firstButtonLayout.add_widget(checkBox)
+        firstButtonLayout.add_widget(checkBoxMouseLabel)
+        firstButtonLayout.add_widget(checkBoxMouse)
+
+        checkBoxMusicLabel = Label(text='Music control on', value=Settings["controlMusic"])
+        checkBoxMusic = CheckBox()
+        checkBoxMusic.bind(active=MainApp.onVideoControlMusicSwitchValueChange)
+
+        firstButtonLayout.add_widget(checkBoxMusicLabel)
+        firstButtonLayout.add_widget(checkBoxMusic)
+
+        checkBoxWorkspaceLabel = Label(text='Control workspace', value=Settings["switchWorkspace"])
+        checkBoxWorkspace = CheckBox()
+        checkBoxWorkspace.bind(active=MainApp.onVideoControlWorkspaceSwitchValueChange)
+
+        firstButtonLayout.add_widget(checkBoxWorkspaceLabel)
+        firstButtonLayout.add_widget(checkBoxWorkspace)
+
+        checkBoxMouseActionLabel = Label(text='Control mouse action', value=Settings["actionMouse"])
+        checkBoxMouseAction = CheckBox()
+        checkBoxMouseAction.bind(active=MainApp.onVideoControlMouseActionSwitchValueChange)
+
+        firstButtonLayout.add_widget(checkBoxMouseActionLabel)
+        firstButtonLayout.add_widget(checkBoxMouseAction)
 
 
         upperHueSliderLabel = Label(text='upper hue slider')
@@ -421,6 +442,18 @@ class MainApp(App):
 
     def onVideoMouseSwitchValueChange(instance, value):
         Settings["mouseOn"] = bool(value)
+        pickle.dump(Settings, open(".config", "w"))
+
+    def onVideoControlMouseActionSwitchValueChange(instance, value):
+        Settings["actionMouse"] = bool(value)
+        pickle.dump(Settings, open(".config", "w"))
+
+    def onVideoControlMusicSwitchValueChange(instance, value):
+        Settings["controlMusic"] = bool(value)
+        pickle.dump(Settings, open(".config", "w"))
+
+    def onVideoControlWorkspaceSwitchValueChange(instance, value):
+        Settings["switchWorkspace"] = bool(value)
         pickle.dump(Settings, open(".config", "w"))
 
     # --- Setting the x crop slider value
