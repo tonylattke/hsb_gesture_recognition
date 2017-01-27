@@ -245,7 +245,7 @@ if __name__ == '__main__':
             # exit()
 
         tracking.imageProcessing()
-        if tracking.settings["mouseOff"]:
+        if tracking.settings["mouseOn"]:
             tracking.actionMouse()
             tracking.updateMousePosition()
         # Exit - Key q

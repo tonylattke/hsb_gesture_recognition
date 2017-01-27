@@ -19,7 +19,6 @@ from kivy.uix.checkbox import CheckBox
 
 # Our Libraries
 import ImageProcessor as ip
-import HandTracking as ht
 
 # Static variables
 imageProcessor = ip.ImageProcessor()
@@ -193,7 +192,7 @@ class MainApp(App):
     # --- Constructs the Video Screen Layout
     def constructVideoScreen(self, videoScreenLayout):
         changeToMainButton = Button(text="Go back to main",
-                                    size_hint=(.2, .1),
+                                    size_hint=(.5, .9),
                                     pos_hint={'center_x': .5, 'center_y': 0.7})
         changeToMainButton.bind(on_press=MainApp.changeToMainScreenFromVideo)
 
@@ -218,7 +217,7 @@ class MainApp(App):
         erodeSliderLabel = Label(text='erode slider')
         erodeSlider = Slider(min=0,
                              max=255,
-                             value=0,
+                             value=Settings["erode"],
                              step=1)
         erodeSlider.bind(value=MainApp.onVideoErodeSliderValueChange)
 
@@ -228,7 +227,7 @@ class MainApp(App):
         dilateSliderLabel = Label(text='dilate slider')
         dilateSlider = Slider(min=0,
                               max=255,
-                              value=0,
+                              value=Settings["dilate"],
                               step=1)
         dilateSlider.bind(value=MainApp.onVideoDilateSliderValueChange)
 
@@ -273,7 +272,7 @@ class MainApp(App):
 
         firstButtonLayout.add_widget(spinner)
 
-        checkBoxLabel = Label(text='upper hue slider')
+        checkBoxLabel = Label(text='Mouse on', value=Settings["mouseOn"])
         checkBox = CheckBox()
         checkBox.bind(active=MainApp.onVideoMouseSwitchValueChange)
 
@@ -417,11 +416,11 @@ class MainApp(App):
 
     # ----------------------------------------------------------------------
     def onVideoDilateSliderValueChange(instance, value):
-        Settings["diilate"] = int(value) + 1
+        Settings["dilate"] = int(value) + 1
         pickle.dump(Settings, open(".config", "w"))
 
     def onVideoMouseSwitchValueChange(instance, value):
-        Settings["mouseOff"] = bool(value)
+        Settings["mouseOn"] = bool(value)
         pickle.dump(Settings, open(".config", "w"))
 
     # --- Setting the x crop slider value
