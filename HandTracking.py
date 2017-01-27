@@ -166,6 +166,12 @@ class HandTracking:
             addText(self.imOrig, ("Fingers: " + str(self.Data["fingers"])), (yPos, pos))
             pos += 20
             addText(self.imOrig, ("Fingers history: " + str(self.Data["fingers history"])), (yPos, pos))
+            pos += 20
+            addText(self.imOrig, ("Blur: " + str(self.settings["blur"])), (yPos, pos))
+            pos += 20
+            addText(self.imOrig, ("Erode: " + str(self.settings["erode"])), (yPos, pos))
+            pos += 20
+            addText(self.imOrig, ("Dilate: " + str(self.settings["dilate"])), (yPos, pos))
 
         # Show the results
         cv2.imshow("HSB - Computational geometry - Lattke & Mindelis", self.imOrig)

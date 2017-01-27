@@ -303,7 +303,7 @@ class MainApp(App):
 
         upperHueSliderLabel = Label(text='upper hue slider')
         upperHueSlider = Slider(min=0,
-                                max=255,
+                                max=180,
                                 value=Settings["upper"],
                                 step=1)
         upperHueSlider.bind(value=MainApp.onVideoUpperHueChange)
@@ -330,7 +330,7 @@ class MainApp(App):
 
         downHueSliderLabel = Label(text='down hue slider')
         downHueSlider = Slider(min=0,
-                               max=255,
+                               max=180,
                                value=Settings["lower"],
                                step=1)
         downHueSlider.bind(value=MainApp.onVideoDownHueChange)
