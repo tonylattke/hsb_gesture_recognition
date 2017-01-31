@@ -1,5 +1,11 @@
+# HSB - Computational Geometry
+# Professor: Martin Hering-Bertram
+# Authors:  Filips Mindelis
+#           Tony Lattke
+
 # Geometry Helpers
 
+# Python Libraries
 import math # Math operations
 
 # Calculates the distance between points
@@ -13,6 +19,7 @@ def calculateAngle(start, end, far):
     c = distance(end, far)
     return math.acos((b ** 2 + c ** 2 - a ** 2) / (2 * b * c)) * 60
 
+# Calculates the mirror for pointA and pointB
 def mirrorPoint(pointA,pointB):
     deltaX = math.fabs(pointB[0] - pointA[0])
     deltaY = math.fabs(pointB[1] - pointA[1])
@@ -22,6 +29,7 @@ def mirrorPoint(pointA,pointB):
     y = pointA[1] + deltaY*k
     return [int(x),int(y)]
 
+# Calculates the center of a list of points
 def obtainCenterOfPoints(points):
     center = [0, 0]
     for point in points:

@@ -3,6 +3,7 @@
 # Authors:  Filips Mindelis
 #           Tony Lattke
 
+# Python Libraries
 from numpy import sqrt
 
 # Calculates the distance between points

@@ -1,5 +1,10 @@
 #!/usr/bin/python
 
+# HSB - Computational Geometry
+# Professor: Martin Hering-Bertram
+# Authors:  Filips Mindelis
+#           Tony Lattke
+
 # Python Libraries
 import os
 import pickle
@@ -505,7 +510,7 @@ class ImageScreen(Screen):
 class VideoScreen(Screen):
     pass
 
-
+# File chooser settings
 Builder.load_string("""
 <FileChooserWidget>:
     id: file_chooser_widget
@@ -514,7 +519,6 @@ Builder.load_string("""
         pos_hint: {'center_y': .4}
         on_selection: file_chooser_widget.selected(filechooser.path, filechooser.selection)
 """)
-
 
 class FileChooserWidget(FloatLayout):
     def selected(self, path, filename):

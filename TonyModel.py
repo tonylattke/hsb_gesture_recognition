@@ -1,3 +1,8 @@
+# HSB - Computational Geometry
+# Professor: Martin Hering-Bertram
+# Authors:  Filips Mindelis
+#           Tony Lattke
+
 # Python Libraries
 import cv2          # OpenCV
 

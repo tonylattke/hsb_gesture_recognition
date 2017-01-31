@@ -31,12 +31,7 @@ class HandTracking:
         self.debugMode = True
 
         # Setting Camera
-        #self.camera = cv2.VideoCapture("test.mp4")
         self.camera = cv2.VideoCapture(0)
-
-        # Resolution of camera
-        # self.camera.set(3, 1024)
-        # self.camera.set(4, 800)
 
         self.previousPosition = 0  # Get the relative position of mouse pointer
 
@@ -53,9 +48,16 @@ class HandTracking:
 
     # imageProcessing - Run the image processing
     def imageProcessing(self):
+        # Reset Model
         self.hand.resetModel()
+        
+        # Read Frame
         ret, im = self.camera.read()
+        
+        # Flip Image
         im = cv2.flip(im, 1)
+
+        # Setting Image
         self.imOrig = im.copy()
         self.imNoFilters = im.copy()
 
@@ -77,6 +79,7 @@ class HandTracking:
 
         # Recognition of contours
         contours, hierarchy = cv2.findContours(filter_, cv2.RETR_LIST, cv2.CHAIN_APPROX_NONE)
+        
         # Filtering the contours
         allIdex = []
         for index in range(len(contours)):
@@ -87,6 +90,7 @@ class HandTracking:
         for index in allIdex:
             contours.pop(index)
         self.hand.contours = contours
+        
         # No contours
         if len(contours) == 0:
             return
@@ -178,14 +182,6 @@ class HandTracking:
 
     # ----------------------------------------------------------------------
     def filterSkin(self, image):
-        # LOWER = np.array([[0, 48, 80]], np.uint8)  # Hautfarbe untere Grenze
-        # UPPER = np.array([[20, 255, 255]], np.uint8) # Hautfarbe obere Grenze
-        # LOWER = np.array([[0,50,50]], np.uint8)  # Rot untere Grenze
-        # UPPER = np.array([[10,255,255]], np.uint8)  # Rot obere Grenze
-        # LOWER = np.array([[5,50,50]], np.uint8)  # Orange untere Grenze
-        # UPPER = np.array([[15,255,255]], np.uint8)  # Orange obere Grenze
-        # LOWER = np.array([[0, 0, 0]], np.uint8)  # Schwarz untere Grenze
-        # UPPER = np.array([[180, 255, 35]], np.uint8)  # Schwarz obere Grenze
         UPPER = np.array([self.settings["upper"], self.settings["filterUpS"], self.settings["filterUpV"]], np.uint8)
         LOWER = np.array([self.settings["lower"], self.settings["filterDownS"], self.settings["filterDownV"]], np.uint8)
         hsv_im = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
