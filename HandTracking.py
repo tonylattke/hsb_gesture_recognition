@@ -263,9 +263,9 @@ class HandTracking:
     # moveMouse - Move the mouse pointer
     def moveWorkspace(self, x, y):
         print x
-        if x > 100:
+        if x > 170:
             os.system("xdotool set_desktop --relative 1")
-        if x < -100:
+        if x < -170:
             os.system("xdotool set_desktop --relative  -- -1")
 
 
