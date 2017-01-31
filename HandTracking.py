@@ -4,16 +4,19 @@
 #           Tony Lattke
 
 # Python Libraries
-import pickle, time, os, threading
 import numpy as np
-from numpy import sqrt, arccos, rad2deg
+import os
+import pickle
+import threading
+import time
+
 import cv2
 
-# Our Libraries
-import TriangleN as tr
 import HandModel as hm
+import TriangleN as tr
 import colors_helpers as ch
 import math_helpers as mh
+
 
 # addText - Add text in an image
 # image : Target image
@@ -50,10 +53,10 @@ class HandTracking:
     def imageProcessing(self):
         # Reset Model
         self.hand.resetModel()
-        
+
         # Read Frame
         ret, im = self.camera.read()
-        
+
         # Flip Image
         im = cv2.flip(im, 1)
 
@@ -79,7 +82,7 @@ class HandTracking:
 
         # Recognition of contours
         contours, hierarchy = cv2.findContours(filter_, cv2.RETR_LIST, cv2.CHAIN_APPROX_NONE)
-        
+
         # Filtering the contours
         allIdex = []
         for index in range(len(contours)):
@@ -90,7 +93,7 @@ class HandTracking:
         for index in allIdex:
             contours.pop(index)
         self.hand.contours = contours
-        
+
         # No contours
         if len(contours) == 0:
             return
@@ -209,7 +212,6 @@ class HandTracking:
             os.system("xdotool key XF86AudioPlay")
             self.Data["fingers history"] = [0]  # Clear history
 
-
     # updateMousePosition - Update the position of the mouse pointer
     def updateMousePosition(self):
         currentPosition = self.hand.centerOfHand
@@ -240,7 +242,6 @@ class HandTracking:
             for i in range(x, 0, stepp):
                 os.system("xdotool mousemove_relative -- %d %d" % (i, mh.smoothPositionY(x, y, i)))
         time.sleep(0.2)
-
 
     # switch workspaces
     def updateWorkspacePosition(self):

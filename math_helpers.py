@@ -6,13 +6,16 @@
 # Python Libraries
 from numpy import sqrt
 
+
 # Calculates the distance between points
 def distance(pointA, pointB):
     return sqrt((pointB[0] - pointA[0]) ** 2 + (pointB[1] - pointA[1]) ** 2)
 
+
 # Tuple structure to List
 def tupleToList(point):
     return [point[0], point[1]]
+
 
 # List to Tuple structure
 def listToTuple(point):
@@ -21,12 +24,14 @@ def listToTuple(point):
     else:
         return (0, 0)
 
+
 # smoothPositionY - Generate a smooth value of y
 # x - X coordinate
 # y - Y coordinate
 # n - Smooth factor
 def smoothPositionY(x, y, n):
     return (y / x) * n
+
 
 # Radious settings
 radious = {

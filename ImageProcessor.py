@@ -5,14 +5,15 @@
 
 # Python Libraries
 import numpy as np  # Functions for images
-import cv2          # OpenCV
 
-# Our Libraries
-import geometry_helpers as gh
-import colors_helpers as ch
-import Triangle as th
+import cv2  # OpenCV
+
 import FilipsModel as hfm
 import TonyModel as htm
+import Triangle as th
+import colors_helpers as ch
+import geometry_helpers as gh
+
 
 # Image Processor
 class ImageProcessor:
@@ -48,6 +49,7 @@ class ImageProcessor:
 
     def __init__(self):
         print "Image processor ready"
+
 
 # Main program
 def analyze(ip):
@@ -111,17 +113,17 @@ def analyze(ip):
                     start = tuple(cnt[s][0])
                     end = tuple(cnt[e][0])
                     far = tuple(cnt[f][0])
-                    angle = gh.calculateAngle(start,end,far)
+                    angle = gh.calculateAngle(start, end, far)
                     if angle <= 90:
                         count_defects += 1
-                        triangle = th.Triangle(start,end,far)
+                        triangle = th.Triangle(start, end, far)
                         triangles.append(triangle)
                     cv2.line(crop_img, start, end, ip.red, ip.lineThickness)
 
             # Calculate center of hand
             centerOfHand = th.listToTuple(th.obtainCenterOfHand(triangles))
 
-            handModel = hfm.FilipsModel(centerOfHand,triangles)
+            handModel = hfm.FilipsModel(centerOfHand, triangles)
             ip.numberOfFingers = handModel.countOfFinger()
             handModel.getCenter()
             handModel.drawLines(drawing, ip.magenta, ip.lineThickness)

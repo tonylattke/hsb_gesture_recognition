@@ -6,6 +6,7 @@
 # Python Libraries
 from numpy import sqrt, arccos, rad2deg
 
+
 class TriangleN:
     cent = []
     rect1 = []
@@ -21,7 +22,7 @@ class TriangleN:
     def angle(self):
         v1 = (self.rect1[0] - self.cent[0], self.rect1[1] - self.cent[1])
         v2 = (self.rect2[0] - self.cent[0], self.rect2[1] - self.cent[1])
-        dist = lambda a:sqrt(a[0] ** 2 + a[1] ** 2)
-        angle = arccos((sum(map(lambda a, b:a*b, v1, v2))) / (dist(v1) * dist(v2)))
+        dist = lambda a: sqrt(a[0] ** 2 + a[1] ** 2)
+        angle = arccos((sum(map(lambda a, b: a * b, v1, v2))) / (dist(v1) * dist(v2)))
         angle = abs(rad2deg(angle))
         return angle

@@ -4,14 +4,15 @@
 #           Tony Lattke
 
 # Python Libraries
-import pickle, time, os, threading
 import numpy as np
-from numpy import sqrt, arccos, rad2deg
+import os
+import threading
+import time
+
 import cv2
 
-# Our Libraries
-import Triangle as tr
 import HandModel as hm
+import Triangle as tr
 import colors_helpers as ch
 import math_helpers as mh
 

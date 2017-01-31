@@ -6,23 +6,22 @@
 #           Tony Lattke
 
 # Python Libraries
+import multiprocessing
 import os
 import pickle
-import multiprocessing
 from kivy.app import App
-from kivy.uix.boxlayout import BoxLayout
-from kivy.uix.floatlayout import FloatLayout
-from kivy.uix.image import Image
-from kivy.uix.button import Button
 from kivy.config import Config
 from kivy.lang import Builder
+from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.button import Button
+from kivy.uix.checkbox import CheckBox
+from kivy.uix.floatlayout import FloatLayout
+from kivy.uix.image import Image
 from kivy.uix.label import Label
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.uix.slider import Slider
 from kivy.uix.spinner import Spinner
-from kivy.uix.checkbox import CheckBox
 
-# Our Libraries
 import ImageProcessor as ip
 
 # Static variables
@@ -305,7 +304,6 @@ class MainApp(App):
         firstButtonLayout.add_widget(checkBoxMouseActionLabel)
         firstButtonLayout.add_widget(checkBoxMouseAction)
 
-
         upperHueSliderLabel = Label(text='upper hue slider')
         upperHueSlider = Slider(min=0,
                                 max=180,
@@ -359,7 +357,6 @@ class MainApp(App):
         downValueSlider.bind(value=MainApp.onVideoDownValueChange)
         secondButtonLayout.add_widget(downValueSliderLabel)
         secondButtonLayout.add_widget(downValueSlider)
-
 
         videoScreenLayout.add_widget(firstButtonLayout)
         videoScreenLayout.add_widget(secondButtonLayout)
@@ -510,6 +507,7 @@ class ImageScreen(Screen):
 class VideoScreen(Screen):
     pass
 
+
 # File chooser settings
 Builder.load_string("""
 <FileChooserWidget>:
@@ -519,6 +517,7 @@ Builder.load_string("""
         pos_hint: {'center_y': .4}
         on_selection: file_chooser_widget.selected(filechooser.path, filechooser.selection)
 """)
+
 
 class FileChooserWidget(FloatLayout):
     def selected(self, path, filename):

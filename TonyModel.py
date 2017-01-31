@@ -4,10 +4,10 @@
 #           Tony Lattke
 
 # Python Libraries
-import cv2          # OpenCV
+import cv2  # OpenCV
 
-# Our Libraries
 import Triangle as th
+
 
 class TonyModel:
     center = None
@@ -18,7 +18,7 @@ class TonyModel:
     lastFinger = None
     defects = 0
 
-    def __init__(self,center,triangles):
+    def __init__(self, center, triangles):
         self.center = center
         self.defects = len(triangles)
 
@@ -29,7 +29,7 @@ class TonyModel:
             self.lastFinger = triangles[0].fingerB
         elif self.defects == 2:
             self.firstFinger = triangles[0].fingerA
-            self.secondFinger = th.averagePoint(triangles[0].fingerB,triangles[1].fingerA)
+            self.secondFinger = th.averagePoint(triangles[0].fingerB, triangles[1].fingerA)
             self.lastFinger = triangles[1].fingerB
         elif self.defects == 3:
             self.firstFinger = triangles[0].fingerA
@@ -43,22 +43,22 @@ class TonyModel:
             self.fourthFinger = th.averagePoint(triangles[2].fingerB, triangles[3].fingerA)
             self.lastFinger = triangles[3].fingerB
 
-    def drawLines(self,image,color,lineThickness):
+    def drawLines(self, image, color, lineThickness):
         if self.defects == 0:
             pass
-        elif self.defects == 1: # 2 Fingers
+        elif self.defects == 1:  # 2 Fingers
             cv2.line(image, th.listToTuple(self.center), th.listToTuple(self.firstFinger), color, lineThickness)
             cv2.line(image, th.listToTuple(self.center), th.listToTuple(self.lastFinger), color, lineThickness)
-        elif self.defects == 2: # 3 Fingers
+        elif self.defects == 2:  # 3 Fingers
             cv2.line(image, th.listToTuple(self.center), th.listToTuple(self.firstFinger), color, lineThickness)
             cv2.line(image, th.listToTuple(self.center), th.listToTuple(self.secondFinger), color, lineThickness)
             cv2.line(image, th.listToTuple(self.center), th.listToTuple(self.lastFinger), color, lineThickness)
-        elif self.defects == 3: # 4 Fingers
+        elif self.defects == 3:  # 4 Fingers
             cv2.line(image, th.listToTuple(self.center), th.listToTuple(self.firstFinger), color, lineThickness)
             cv2.line(image, th.listToTuple(self.center), th.listToTuple(self.secondFinger), color, lineThickness)
             cv2.line(image, th.listToTuple(self.center), th.listToTuple(self.middleFinger), color, lineThickness)
             cv2.line(image, th.listToTuple(self.center), th.listToTuple(self.lastFinger), color, lineThickness)
-        elif self.defects == 4: # 5 Fingers
+        elif self.defects == 4:  # 5 Fingers
             cv2.line(image, th.listToTuple(self.center), th.listToTuple(self.firstFinger), color, lineThickness)
             cv2.line(image, th.listToTuple(self.center), th.listToTuple(self.secondFinger), color, lineThickness)
             cv2.line(image, th.listToTuple(self.center), th.listToTuple(self.middleFinger), color, lineThickness)

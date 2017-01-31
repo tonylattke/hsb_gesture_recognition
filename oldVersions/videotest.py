@@ -1,4 +1,6 @@
-import pickle, time, os, threading
+import os
+import pickle
+import threading
 
 try:
     import numpy as np
@@ -324,18 +326,18 @@ class HandTracking:
             os.system("xdotool set_desktop --relative 1")
         if x < -270:
             os.system("xdotool set_desktop --relative  -- -1")
-        # mul = 2
-        # x *= mul
-        # y *= mul
-        # # Un movimiento fluido...
-        # posy = lambda n: (y / x) * n  #
-        # stepp = 10
-        # # ... y la recorre en x cada 10px
-        # if x > 0:
-        #     for i in range(0, x, stepp): os.system("xdotool mousemove_relative -- %d %d" % (i, posy(i)))
-        # if x < 0:
-        #     for i in range(x, 0, stepp): os.system("xdotool mousemove_relative -- %d %d" % (i, posy(i)))
-        # time.sleep(0.2)
+            # mul = 2
+            # x *= mul
+            # y *= mul
+            # # Un movimiento fluido...
+            # posy = lambda n: (y / x) * n  #
+            # stepp = 10
+            # # ... y la recorre en x cada 10px
+            # if x > 0:
+            #     for i in range(0, x, stepp): os.system("xdotool mousemove_relative -- %d %d" % (i, posy(i)))
+            # if x < 0:
+            #     for i in range(x, 0, stepp): os.system("xdotool mousemove_relative -- %d %d" % (i, posy(i)))
+            # time.sleep(0.2)
 
 
 if __name__ == '__main__':
